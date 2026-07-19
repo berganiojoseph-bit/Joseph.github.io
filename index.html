@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joseph Berganio — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#161b26;
+    --bg-alt:#1c2231;
+    --surface:#212939;
+    --surface-hi:#2a3345;
+    --line:#323d52;
+    --text:#e7eaf2;
+    --text-dim:#8b93a9;
+    --text-faint:#5c6579;
+    --accent:#5ce1c8;      /* teal - function/method color */
+    --accent-2:#f2b866;    /* amber - string color */
+    --accent-3:#c48cf2;    /* lavender - keyword color */
+    --danger:#ef6f6f;
+    --radius:8px;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--accent); color:#0b0f16; }
+
+  a{ color:inherit; }
+
+  /* ---------- Editor chrome ---------- */
+  .editor{
+    max-width:1000px;
+    margin:32px auto;
+    background:var(--bg-alt);
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.5);
+  }
+  .titlebar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:12px 16px;
+    background:var(--surface);
+    border-bottom:1px solid var(--line);
+  }
+  .dot{ width:11px; height:11px; border-radius:50%; }
+  .dot.red{ background:#ef6f6f; }
+  .dot.yellow{ background:#f2c866; }
+  .dot.green{ background:#6fcf97; }
+  .titlebar-name{
+    margin-left:12px;
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:var(--text-faint);
+  }
+
+  /* ---------- Tab bar (nav) ---------- */
+  .tabbar{
+    display:flex;
+    background:var(--bg-alt);
+    border-bottom:1px solid var(--line);
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .tabbar::-webkit-scrollbar{ display:none; }
+  .tab{
+    font-family:var(--mono);
+    font-size:13px;
+    padding:12px 20px;
+    color:var(--text-faint);
+    text-decoration:none;
+    white-space:nowrap;
+    border-right:1px solid var(--line);
+    border-bottom:2px solid transparent;
+    transition:color .15s ease, border-color .15s ease, background .15s ease;
+  }
+  .tab:hover{ color:var(--text); background:var(--surface); }
+  .tab .ext{ color:var(--accent-3); opacity:.8; }
+
+  /* ---------- Body / gutter ---------- */
+  .body-wrap{
+    display:flex;
+  }
+  .gutter{
+    width:48px;
+    padding:28px 0;
+    text-align:right;
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--text-faint);
+    background:var(--bg-alt);
+    user-select:none;
+    line-height:2.1;
+    flex-shrink:0;
+  }
+  .gutter span{ display:block; padding-right:14px; }
+  .content{
+    flex:1;
+    padding:28px 32px 28px 24px;
+    min-width:0;
+  }
+
+  section{ padding:56px 0; border-bottom:1px dashed var(--line); }
+  section:last-child{ border-bottom:none; padding-bottom:24px;}
+
+  .comment{ color:var(--text-faint); font-family:var(--mono); font-size:13px; }
+  .kw{ color:var(--accent-3); }
+  .fn{ color:var(--accent); }
+  .str{ color:var(--accent-2); }
+  .punc{ color:var(--text-dim); }
+
+  /* ---------- Hero ---------- */
+  #about{ padding-top:36px; }
+  .hero-code{
+    font-family:var(--mono);
+    font-size:14px;
+    line-height:1.9;
+  }
+  .hero-name{
+    font-family:var(--mono);
+    font-weight:800;
+    font-size:clamp(28px, 5vw, 46px);
+    margin:14px 0 6px 0;
+    letter-spacing:-0.01em;
+  }
+  .hero-name .quote{ color:var(--accent-2); }
+  .hero-role{
+    font-family:var(--mono);
+    color:var(--accent);
+    font-size:15px;
+    margin-bottom:22px;
+  }
+  .cursor{
+    display:inline-block;
+    width:8px; height:1.1em;
+    background:var(--accent);
+    margin-left:2px;
+    animation:blink 1s steps(1) infinite;
+    vertical-align:text-bottom;
+  }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  .bio{
+    max-width:640px;
+    font-size:15.5px;
+    line-height:1.75;
+    color:var(--text-dim);
+    margin:18px 0 26px 0;
+  }
+  .bio strong{ color:var(--text); font-weight:600; }
+
+  .cta-row{ display:flex; gap:12px; flex-wrap:wrap; }
+  .btn{
+    font-family:var(--mono);
+    font-size:13px;
+    padding:11px 18px;
+    border-radius:6px;
+    text-decoration:none;
+    border:1px solid var(--line);
+    transition:transform .15s ease, border-color .15s ease, background .15s ease;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-primary{
+    background:var(--accent);
+    color:#0b0f16;
+    border-color:var(--accent);
+    font-weight:600;
+  }
+  .btn-primary:hover{ transform:translateY(-2px); }
+  .btn-ghost{ color:var(--text-dim); }
+  .btn-ghost:hover{ color:var(--text); border-color:var(--text-faint); transform:translateY(-2px); }
+
+  /* ---------- Section headers ---------- */
+  .sec-head{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--text-faint);
+    margin-bottom:20px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .sec-head::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--line);
+  }
+  h2.sec-title{
+    font-family:var(--sans);
+    font-size:24px;
+    font-weight:700;
+    margin:0 0 24px 0;
+  }
+  h2.sec-title .brace{ color:var(--accent-3); font-family:var(--mono); }
+
+  /* ---------- Projects ---------- */
+  .projects{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  @media (max-width:680px){ .projects{ grid-template-columns:1fr; } }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .card:hover{ border-color:var(--accent); transform:translateY(-3px); }
+  .card-file{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--text-faint);
+    margin-bottom:10px;
+  }
+  .card-title{ font-size:17px; font-weight:700; margin:0 0 8px 0; }
+  .card-desc{ font-size:14px; color:var(--text-dim); line-height:1.6; margin:0 0 14px 0; }
+  .tags{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+  .tag{
+    font-family:var(--mono);
+    font-size:11px;
+    padding:3px 9px;
+    background:var(--bg-alt);
+    border:1px solid var(--line);
+    border-radius:20px;
+    color:var(--accent-2);
+  }
+  .card-links{ display:flex; gap:14px; font-family:var(--mono); font-size:12.5px; }
+  .card-links a{ text-decoration:none; color:var(--accent); border-bottom:1px solid transparent; }
+  .card-links a:hover{ border-color:var(--accent); }
+
+  /* ---------- Skills ---------- */
+  .skills-json{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 24px;
+    font-family:var(--mono);
+    font-size:13.5px;
+    line-height:2;
+    overflow-x:auto;
+  }
+  .skills-json .key{ color:var(--accent-3); }
+  .skills-json .arr{ color:var(--text-dim); }
+  .chip-row{ display:flex; flex-wrap:wrap; gap:8px; margin:4px 0 10px 20px; }
+  .chip{
+    background:var(--bg-alt);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-size:12px;
+    padding:5px 11px;
+    border-radius:5px;
+  }
+
+  /* ---------- Timeline (education) ---------- */
+  .edu{
+    display:flex; gap:16px; padding:16px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .edu:last-child{ border-bottom:none; }
+  .edu-marker{ font-family:var(--mono); color:var(--accent); font-size:13px; padding-top:2px; }
+  .edu-school{ font-weight:700; font-size:15.5px; margin-bottom:3px; }
+  .edu-meta{ font-family:var(--mono); font-size:12.5px; color:var(--text-faint); }
+
+  /* ---------- Contact ---------- */
+  .contact-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:28px;
+  }
+  .contact-list{ list-style:none; margin:16px 0 0 0; padding:0; display:flex; flex-direction:column; gap:12px; }
+  .contact-list li{ display:flex; align-items:center; gap:12px; font-family:var(--mono); font-size:14px; }
+  .contact-list .k{ color:var(--text-faint); width:80px; flex-shrink:0; }
+  .contact-list a{ text-decoration:none; color:var(--accent); }
+  .contact-list a:hover{ text-decoration:underline; }
+
+  footer{
+    text-align:center;
+    padding:24px;
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--text-faint);
+  }
+
+  @media (max-width:680px){
+    .gutter{ display:none; }
+    .content{ padding:22px 18px; }
+    .editor{ margin:0; border-radius:0; border-left:none; border-right:none; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
+  }
+
+  /* ---------- Minimal aesthetic cursor ---------- */
+  .has-custom-cursor, .has-custom-cursor *{ cursor:none !important; }
+
+  #cursorCanvas{
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    pointer-events:none;
+    z-index:9998;
+  }
+
+  .cursor-dot{
+    position:fixed;
+    top:0; left:0;
+    width:6px; height:6px;
+    border-radius:50%;
+    background:var(--accent);
+    pointer-events:none;
+    z-index:9999;
+    transform:translate(-50%, -50%);
+    will-change:transform;
+  }
+
+  .cursor-halo{
+    position:fixed;
+    top:0; left:0;
+    width:30px; height:30px;
+    border-radius:50%;
+    border:1px solid rgba(92,225,200,0.5);
+    pointer-events:none;
+    z-index:9999;
+    transform:translate(-50%, -50%) scale(1);
+    transition:width .25s cubic-bezier(.16,.8,.3,1), height .25s cubic-bezier(.16,.8,.3,1),
+               border-color .25s ease, opacity .25s ease;
+    will-change:transform;
+  }
+  .cursor-halo.hovering{
+    width:44px; height:44px;
+    border-color:rgba(92,225,200,0.85);
+  }
+
+  .cursor-click-ring{
+    position:fixed;
+    top:0; left:0;
+    width:8px; height:8px;
+    border-radius:50%;
+    border:1px solid var(--accent);
+    pointer-events:none;
+    z-index:9999;
+    transform:translate(-50%,-50%) scale(1);
+    opacity:0;
+  }
+  .cursor-click-ring.pulse{
+    animation:clickPulse .5s ease-out forwards;
+  }
+  @keyframes clickPulse{
+    0%{ opacity:.6; transform:translate(-50%,-50%) scale(1); }
+    100%{ opacity:0; transform:translate(-50%,-50%) scale(4); }
+  }
+
+  @media (hover:none), (pointer:coarse){
+    #cursorCanvas, .cursor-dot, .cursor-halo, .cursor-click-ring{ display:none; }
+    .has-custom-cursor, .has-custom-cursor *{ cursor:auto !important; }
+  }
+</style>
+
+
+
+</head>
+<body>
+
+<canvas id="cursorCanvas"></canvas>
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-halo" id="cursorHalo"></div>
+<div class="cursor-click-ring" id="cursorClickRing"></div>
+
+<div class="editor">
+  <div class="titlebar">
+    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+    <span class="titlebar-name">Joseph Berganio — portfolio — ~/dev</span>
+  </div>
+
+  <nav class="tabbar">
+    <a class="tab" href="#about">about<span class="ext">.js</span></a>
+    <a class="tab" href="#projects">projects<span class="ext">.js</span></a>
+    <a class="tab" href="#skills">skills<span class="ext">.json</span></a>
+    <a class="tab" href="#education">education<span class="ext">.md</span></a>
+    <a class="tab" href="#contact">contact<span class="ext">.md</span></a>
+  </nav>
+
+  <div class="body-wrap">
+    <div class="gutter">
+      <span>01</span><span>02</span><span>03</span><span>04</span><span>05</span>
+      <span>06</span><span>07</span><span>08</span><span>09</span><span>10</span>
+      <span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+      <span>16</span><span>17</span><span>18</span><span>19</span><span>20</span>
+    </div>
+
+    <div class="content">
+
+      <!-- ABOUT -->
+      <section id="about">
+        <div class="hero-code">
+          <span class="kw">const</span> <span class="fn">developer</span> <span class="punc">=</span> <span class="punc">{</span>
+        </div>
+        <h1 class="hero-name">Joseph M. Berganio<span class="quote">;</span></h1>
+        <div class="hero-role">&gt; Aspiring Web Developer | AI Automation Builder<span class="cursor"></span></div>
+
+        <p class="bio">
+        I recently graduated with a <strong>BS in Information Technology</strong> and love building
+        things for the web — mostly with <strong>JavaScript, PHP, and HTML</strong>. During school, I
+        shipped full-stack projects ranging from small tools to complete web apps, working both
+        solo and in small teams. Now I'm looking for a <strong>junior developer</strong> role where I
+        can keep learning fast and shipping real features. I care about clean UI, readable code,
+        and coffee that's stronger than my Wi-Fi.
+        </p>
+
+        
+      </section>
+
+      <!-- PROJECTS -->
+      <section id="projects">
+        <div class="sec-head">02 — projects.js</div>
+        <h2 class="sec-title"><span class="brace">{</span> Things I've built <span class="brace">}</span></h2>
+
+        <div class="projects">
+
+          <div class="card">
+            <div class="card-file">📁 Document Request Kiosk-system/</div>
+            <h3 class="card-title"> Baranggay Kiosk System</h3>
+            <p class="card-desc">A desktop-based document request kiosk system that enables residents to 
+              conveniently request barangay documents, and receive automated notifications while helping staff manage records efficiently.</p>
+            <div class="tags">
+              <span class="tag">JavaScript</span><span class="tag">MySQL</span><span class="tag">PHP</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-file">📁 Online Booking/</div>
+            <h3 class="card-title">Hotel Online Booking</h3>
+            <p class="card-desc">An online hotel reservation platform designed to simplify room bookings, manage guest information, and improve the overall booking experience.</p>
+            <div class="tags">
+              <span class="tag">MySQL</span><span class="tag">PHP</span><span class="tag">JavaScript</span>
+            </div>
+          </div>
+
+         
+
+          <div class="card">
+            <div class="card-file">📁 portfolio-site/</div>
+            <h3 class="card-title">This Portfolio</h3>
+            <p class="card-desc">The site you're looking at right now — hand-coded, code-editor themed, no framework needed. Built to look like the tools I actually work in.</p>
+            <div class="tags">
+              <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SKILLS -->
+      <section id="skills">
+        <div class="sec-head">03 — skills.json</div>
+        <h2 class="sec-title"><span class="brace">{</span> What I work with <span class="brace">}</span></h2>
+
+        <div class="skills-json">
+          <div><span class="punc">{</span></div>
+          <div>&nbsp;&nbsp;<span class="key">"languages"</span><span class="punc">:</span> <span class="arr">[</span></div>
+          <div class="chip-row">
+            <span class="chip">JavaScript</span><span class="chip">PHP</span><span class="chip">Java</span><span class="chip">SQL</span>
+          </div>
+          <div><span class="arr">],</span></div>
+
+          <div>&nbsp;&nbsp;<span class="key">"frontend"</span><span class="punc">:</span> <span class="arr">[</span></div>
+          <div class="chip-row">
+            <span class="chip">Bootstrap</span>><span class="chip">JavaScript</span>
+          </div>
+          <div><span class="arr">],</span></div>
+
+          <div>&nbsp;&nbsp;<span class="key">"backend"</span><span class="punc">:</span> <span class="arr">[</span></div>
+          <div class="chip-row">
+            <span class="chip">Node.js</span><span class="chip">PHP</span>
+          </div>
+          <div><span class="arr">],</span></div>
+
+          <div>&nbsp;&nbsp;<span class="key">"databases"</span><span class="punc">:</span> <span class="arr">[</span></div>
+          <div class="chip-row">
+            <span class="chip">MySQL</span>
+          </div>
+          <div><span class="arr">],</span></div>
+
+          <div>&nbsp;&nbsp;<span class="key">"tools"</span><span class="punc">:</span> <span class="arr">[</span></div>
+          <div class="chip-row">
+            <span class="chip">Git / GitHub</span><span class="chip">VS Code</span><span class="chip">Figma</span>
+          </div>
+          <div><span class="arr">]</span></div>
+          <div><span class="punc">}</span></div>
+        </div>
+      </section>
+
+      <!-- EDUCATION -->
+      <section id="education">
+        <div class="sec-head">04 — education.md</div>
+        <h2 class="sec-title"><span class="brace">{</span> Background <span class="brace">}</span></h2>
+
+        <div class="edu">
+          <div class="edu-marker">►</div>
+          <div>
+            <div class="edu-school">BS Information Technology</div>
+            <div class="edu-meta">IETI COLLEGE OF SCIENCE AND TECHNOLOGY, INC SAN PEDRO, LAGUNA · 2022 – 2026 · Graduated</div>
+          </div>
+        </div>
+        <div class="edu">
+          <div class="edu-marker">►</div>
+          <div>
+            <div class="edu-school">Relevant coursework</div>
+            <div class="edu-meta">Web Development · Graphic Design · API Integration · AI Automation with n8n (Currently Learning)</div>
+          </div>
+        </div>
+        
+      </section>
+
+      <!-- CONTACT -->
+      <section id="contact">
+        <div class="sec-head">05 — contact.md</div>
+        <h2 class="sec-title"><span class="brace">{</span> Let's talk <span class="brace">}</span></h2>
+
+        <div class="contact-card">
+          <p class="comment">// I'm open to junior developer roles and internships — reach out anytime.</p>
+          <ul class="contact-list">
+            <li><span class="k">email</span> <a href="mailto:berganiojoseph100@email.com">berganiojoseph100@email.com</a></li>
+            <li><span class="k">github</span> <a href="https://github.com/yourusername" target="_blank" rel="noopener">github.com/yourusername</a></li>
+            <li><span class="k">linkedin</span> <a href="https://linkedin.com/in/yourusername" target="_blank" rel="noopener">linkedin.com/in/yourusername</a></li>
+            <li><span class="k">location</span> Philippines</li>
+          </ul>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<footer>// built with HTML, CSS & JS — no framework required &nbsp;·&nbsp; © 2026 Joseph Berganio</footer>
+
+<script>
+  // Typing cursor already handled via CSS. Active tab highlight on scroll:
+  const tabs = document.querySelectorAll('.tab');
+  const sections = document.querySelectorAll('section');
+  const setActive = () => {
+    let current = sections[0].id;
+    const offset = 120;
+    sections.forEach(sec => {
+      if (window.scrollY + offset >= sec.offsetTop) current = sec.id;
+    });
+    tabs.forEach(t => {
+      t.style.borderBottomColor = t.getAttribute('href') === '#' + current ? 'var(--accent)' : 'transparent';
+      t.style.color = t.getAttribute('href') === '#' + current ? 'var(--text)' : '';
+    });
+  };
+  document.addEventListener('scroll', setActive);
+  setActive();
+
+  // ---------- Minimal aesthetic cursor: dot + trailing halo + faint trail ----------
+  const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!isTouch) {
+    document.body.classList.add('has-custom-cursor');
+
+    const dot = document.getElementById('cursorDot');
+    const halo = document.getElementById('cursorHalo');
+    const clickRing = document.getElementById('cursorClickRing');
+    const canvas = document.getElementById('cursorCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas(){
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+    let haloX = mouseX, haloY = mouseY;
+    let particles = [];
+    let lastSpawn = 0;
+
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+
+      if (!prefersReducedMotion) {
+        const now = performance.now();
+        if (now - lastSpawn > 45) {
+          lastSpawn = now;
+          particles.push({ x: mouseX, y: mouseY, r: 2, life: 1 });
+          if (particles.length > 14) particles.shift();
+        }
+      }
+    });
+
+    window.addEventListener('mousedown', (e) => {
+      clickRing.style.left = e.clientX + 'px';
+      clickRing.style.top = e.clientY + 'px';
+      clickRing.classList.remove('pulse');
+      void clickRing.offsetWidth;
+      clickRing.classList.add('pulse');
+    });
+
+    function animate(){
+      haloX += (mouseX - haloX) * 0.16;
+      haloY += (mouseY - haloY) * 0.16;
+      halo.style.transform = `translate(${haloX}px, ${haloY}px) translate(-50%, -50%)`;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.life -= 0.045;
+        if (p.life > 0) {
+          ctx.beginPath();
+          ctx.globalAlpha = Math.max(p.life, 0) * 0.35;
+          ctx.fillStyle = '#5ce1c8';
+          ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+      ctx.globalAlpha = 1;
+      particles = particles.filter(p => p.life > 0);
+
+      requestAnimationFrame(animate);
+    }
+
+    if (prefersReducedMotion) {
+      window.addEventListener('mousemove', (e) => {
+        halo.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+      });
+    } else {
+      animate();
+    }
+
+    document.querySelectorAll('a, button, .tab, .btn, .card').forEach(el => {
+      el.addEventListener('mouseenter', () => halo.classList.add('hovering'));
+      el.addEventListener('mouseleave', () => halo.classList.remove('hovering'));
+    });
+  }
+</script>
+
+</body>
+</html>
